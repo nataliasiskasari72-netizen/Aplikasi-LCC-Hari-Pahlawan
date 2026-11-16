@@ -316,6 +316,39 @@ footer {
       </div>
     </div>
 
+<!-- TAB 1: REKAP & RANKING -->
+    <div id="adminTabRekap">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div style="min-width:240px;">
+          <label for="filterRekapTahap" style="margin-bottom:4px;">Filter Tahap Perlombaan:</label>
+          <select id="filterRekapTahap" onchange="renderLeaderboard()"></select>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="fetchOnlineLeaderboard()">🔄 Tarik Data Online</button>
+          <button class="btn btn-success btn-sm" onclick="exportExcel()">📥 Ekspor Excel (.xlsx)</button>
+          <button class="btn btn-danger btn-sm" onclick="clearLeaderboard()">🗑️ Reset Rekap</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Kelas</th>
+              <th>Nama Regu</th>
+              <th>Benar</th>
+              <th>Skor</th>
+              <th>Status Kelolosan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    
     <!-- TAB 2: BANK SOAL -->
     <div id="adminTabSoal" class="hidden">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:16px; background:#f8fafc; padding:12px; border-radius:10px; border:1px solid var(--border);">
