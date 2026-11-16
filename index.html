@@ -413,7 +413,7 @@
 
 <script>
   // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP (/exec) ANDA DARI GOOGLE APPS SCRIPT
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwgwaMtq06Svr6LucS8p-89_TjXuwbhlv-AVbGGUYewSihoFA-no_vx9oXhCjw3-lDk/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbztdM9NDVb78kHjdxV06LOrhc36bswO-YQ6XVNS7o71J0kWGHjh7A7CPjmXdunlUctN/exec";
 
   const DEFAULT_LOGO = "data:image/svg+xml;utf8," + encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
@@ -643,7 +643,7 @@
     };
 
     // Kirim data otomatis ke Google Sheets
-    if (WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbwgwaMtq06Svr6LucS8p-89_TjXuwbhlv-AVbGGUYewSihoFA-no_vx9oXhCjw3-lDk/exec") {
+    if (WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbztdM9NDVb78kHjdxV06LOrhc36bswO-YQ6XVNS7o71J0kWGHjh7A7CPjmXdunlUctN/exec") {
       fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
@@ -715,7 +715,7 @@
   }
 
   function fetchOnlineLeaderboard() {
-    if (!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbwgwaMtq06Svr6LucS8p-89_TjXuwbhlv-AVbGGUYewSihoFA-no_vx9oXhCjw3-lDk/exec") {
+    if (!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbztdM9NDVb78kHjdxV06LOrhc36bswO-YQ6XVNS7o71J0kWGHjh7A7CPjmXdunlUctN/exec") {
       return alert("URL Web App Google Sheets belum diatur di dalam kode!");
     }
     alert("Mengambil data rekap terbaru dari Google Sheets...");
