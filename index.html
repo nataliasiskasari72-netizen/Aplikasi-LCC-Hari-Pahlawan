@@ -424,8 +424,8 @@
     </svg>
   `);
 
-  const STAGE_1 = "PPKn - Tahap 1 (Penyisihan)";
-  const STAGE_2 = "PPKn - Tahap 2 (Babak Final)";
+  const STAGE_1 = "Tahap 1 (Penyisihan)";
+  const STAGE_2 = "Tahap 2 (Babak Final)";
 
   const DEFAULT_QUESTIONS = [
     { category: STAGE_1, question: "Hari Pahlawan diperingati setiap tanggal ....", options: ["17 Agustus", "10 November", "20 Mei", "28 Oktober"], answer: 1 },
@@ -643,7 +643,7 @@
     };
 
     // Kirim data otomatis ke Google Sheets
-    if (WEB_APP_URL && WEB_APP_URL !== "MASUKKAN_URL_WEB_APP_ANDA_DI_SINI") {
+    if (WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbyf1hMrVG5weKULtgGXTWo1S4qzEgb-asWjnaodRxqlxFon8uOZ6V3WO5WLaqfGQ0A/exec") {
       fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
@@ -715,7 +715,7 @@
   }
 
   function fetchOnlineLeaderboard() {
-    if (!WEB_APP_URL || WEB_APP_URL === "MASUKKAN_URL_WEB_APP_ANDA_DI_SINI") {
+    if (!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbyf1hMrVG5weKULtgGXTWo1S4qzEgb-asWjnaodRxqlxFon8uOZ6V3WO5WLaqfGQ0A/exec") {
       return alert("URL Web App Google Sheets belum diatur di dalam kode!");
     }
     alert("Mengambil data rekap terbaru dari Google Sheets...");
