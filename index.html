@@ -272,7 +272,7 @@
       <div id="resScore" style="font-size:3rem; font-weight:800; color:var(--primary-light); line-height:1.1; margin:6px 0;">0</div>
       <div id="resDetail" style="font-size:0.92rem; color:var(--text);">Benar: 0 | Salah: 0</div>
     </div>
-    <p style="font-size:0.9rem; color:var(--muted);">Nilai Anda telah tersimpan otomatis ke papan peringkat panitia/guru.</p>
+    <p style="font-size:0.9rem; color:var(--muted);">Nilai Anda telah terkirim otomatis ke server panitia/guru.</p>
     <button class="btn btn-primary" onclick="resetToHome()">Kembali ke Halaman Awal</button>
   </div>
 
@@ -297,8 +297,9 @@
           <select id="filterRekapTahap" onchange="renderLeaderboard()"></select>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="fetchOnlineLeaderboard()">🔄 Tarik Data Online</button>
           <button class="btn btn-success btn-sm" onclick="exportExcel()">📥 Ekspor Excel (.xlsx)</button>
-          <button class="btn btn-danger btn-sm" onclick="clearLeaderboard()">🗑️ Reset Rekap Nilai</button>
+          <button class="btn btn-danger btn-sm" onclick="clearLeaderboard()">🗑️ Reset Rekap</button>
         </div>
       </div>
 
@@ -407,10 +408,13 @@
 </div>
 
 <footer>
-  Aplikasi LCC Hari Pahlawan Powered by @Kusworo 2026
+  APLIKASI LCC SMP NEGERI 2 PURWOSARI POWERED BY@KUSWORO 2026
 </footer>
 
 <script>
+  // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP (/exec) ANDA DARI GOOGLE APPS SCRIPT
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxy06_MQ7wqNi056paaU2xjue41dCXEckL3UFpfNfa3nG2IY2ysHVXo2lGW1YpXvfc1/exec";
+
   const DEFAULT_LOGO = "data:image/svg+xml;utf8," + encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
       <path d="M60 6 L108 24 V62 C108 90 86 108 60 116 C34 108 12 90 12 62 V24 Z" fill="#1e3a8a" stroke="#d97706" stroke-width="6"/>
@@ -420,8 +424,8 @@
     </svg>
   `);
 
-  const STAGE_1 = "Tahap 1 Penyisihan";
-  const STAGE_2 = "Tahap 2 Babak SemiFinal";
+  const STAGE_1 = "Tahap 1 (Penyisihan)";
+  const STAGE_2 = "Tahap 2 (Babak Final)";
 
   const DEFAULT_QUESTIONS = [
     { category: STAGE_1, question: "Hari Pahlawan diperingati setiap tanggal ....", options: ["17 Agustus", "10 November", "20 Mei", "28 Oktober"], answer: 1 },
@@ -477,17 +481,17 @@
     { category: STAGE_2, question: "Sekelompok siswa akan membuat kegiatan peringatan Hari Pahlawan. Mereka memiliki dua pilihan kegiatan:\nKegiatan I: Mengadakan lomba menyanyikan lagu perjuangan saja.\nKegiatan II: Mengadakan lomba lagu perjuangan sekaligus aksi sosial membantu masyarakat sekitar.\nJika tujuan kegiatan adalah meneladani nilai perjuangan pahlawan secara nyata, pilihan yang paling tepat adalah ....", options: ["Kegiatan I, karena hanya membutuhkan waktu singkat", "Kegiatan II, karena menggabungkan penghargaan sejarah dengan tindakan nyata kepedulian sosial", "Kedua kegiatan tidak perlu dilaksanakan", "Kegiatan I, karena kegiatan sosial bukan bagian dari semangat kepahlawanan"], answer: 1 }
   ];
 
-  let questions = JSON.parse(localStorage.getItem("lcc_purwosari_questions_v1")) || JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
-  let stagePasswords = JSON.parse(localStorage.getItem("lcc_purwosari_stage_pass_v1")) || {
+  let questions = JSON.parse(localStorage.getItem("lcc_purwosari_questions_v2")) || JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+  let stagePasswords = JSON.parse(localStorage.getItem("lcc_purwosari_stage_pass_v2")) || {
     [STAGE_1]: "PAHLAWAN1",
     [STAGE_2]: "MERDEKA2"
   };
-  let leaderboard = JSON.parse(localStorage.getItem("lcc_purwosari_scores_v1")) || [];
-  let settings = JSON.parse(localStorage.getItem("lcc_purwosari_settings_v1")) || {
+  let leaderboard = JSON.parse(localStorage.getItem("lcc_purwosari_scores_v2")) || [];
+  let settings = JSON.parse(localStorage.getItem("lcc_purwosari_settings_v2")) || {
     schoolName: "SMP NEGERI 2 PURWOSARI",
     quizTitle: "Lomba Cerdas Cermat dalam Rangka Memperingati Hari Pahlawan",
     logo: DEFAULT_LOGO,
-    adminPin: "Ari1981#*#"
+    adminPin: "1234"
   };
 
   let activeQuiz = {
@@ -500,10 +504,10 @@
   };
 
   function saveAllState() {
-    localStorage.setItem("lcc_purwosari_questions_v1", JSON.stringify(questions));
-    localStorage.setItem("lcc_purwosari_stage_pass_v1", JSON.stringify(stagePasswords));
-    localStorage.setItem("lcc_purwosari_scores_v1", JSON.stringify(leaderboard));
-    localStorage.setItem("lcc_purwosari_settings_v1", JSON.stringify(settings));
+    localStorage.setItem("lcc_purwosari_questions_v2", JSON.stringify(questions));
+    localStorage.setItem("lcc_purwosari_stage_pass_v2", JSON.stringify(stagePasswords));
+    localStorage.setItem("lcc_purwosari_scores_v2", JSON.stringify(leaderboard));
+    localStorage.setItem("lcc_purwosari_settings_v2", JSON.stringify(settings));
   }
 
   function applyBranding() {
@@ -629,16 +633,26 @@
     const total = activeQuiz.items.length;
     const score = Math.round((correct / total) * 100);
 
-    leaderboard.push({
-      id: Date.now(),
+    const resultData = {
       kelas: activeQuiz.kelas,
       namaRegu: activeQuiz.namaRegu,
       tahap: activeQuiz.tahap,
       benar: correct,
       total: total,
-      skor: score,
-      waktu: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
-    });
+      skor: score
+    };
+
+    // Kirim data otomatis ke Google Sheets
+    if (WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbxy06_MQ7wqNi056paaU2xjue41dCXEckL3UFpfNfa3nG2IY2ysHVXo2lGW1YpXvfc1/exec") {
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(resultData)
+      }).catch(err => console.log("Gagal kirim ke sheets", err));
+    }
+
+    leaderboard.push({ id: Date.now(), ...resultData, waktu: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }) });
     saveAllState();
 
     document.getElementById("viewQuiz").classList.add("hidden");
@@ -700,6 +714,34 @@
     }
   }
 
+  function fetchOnlineLeaderboard() {
+    if (!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxy06_MQ7wqNi056paaU2xjue41dCXEckL3UFpfNfa3nG2IY2ysHVXo2lGW1YpXvfc1/exec") {
+      return alert("URL Web App Google Sheets belum diatur di dalam kode!");
+    }
+    alert("Mengambil data rekap terbaru dari Google Sheets...");
+    fetch(WEB_APP_URL)
+      .then(res => res.json())
+      .then(data => {
+        leaderboard = data.map((item, index) => ({
+          id: index + 1,
+          kelas: item.kelas,
+          namaRegu: item.namaRegu,
+          tahap: item.tahap,
+          benar: item.benar,
+          total: item.total,
+          skor: item.skor,
+          waktu: new Date(item.waktu).toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
+        }));
+        saveAllState();
+        renderLeaderboard();
+        alert("Berhasil memuat data nilai online!");
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Gagal mengambil data online. Pastikan deploy Apps Script sudah benar.");
+      });
+  }
+
   function renderLeaderboard() {
     const filter = document.getElementById("filterRekapTahap").value;
     let filtered = filter === "ALL" ? [...leaderboard] : leaderboard.filter(item => item.tahap === filter);
@@ -707,7 +749,7 @@
 
     const tbody = document.getElementById("leaderboardBody");
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:20px;">Belum ada data nilai masuk.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:20px;">Belum ada data nilai. Klik tombol "Tarik Data Online" untuk memuat dari Google Sheets.</td></tr>`;
       return;
     }
 
@@ -746,7 +788,7 @@
   }
 
   function clearLeaderboard() {
-    if (!confirm("Yakin ingin mereset/menghapus seluruh rekap nilai?")) return;
+    if (!confirm("Yakin ingin mereset seluruh rekap lokal?")) return;
     leaderboard = [];
     saveAllState();
     renderLeaderboard();
@@ -799,7 +841,7 @@
       .filter(q => filter === "ALL" || q.category === filter);
 
     if (listWithIndex.length === 0) {
-      container.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">Bank soal kosong. Silakan tambah soal baru atau pulihkan soal bawaan.</p>`;
+      container.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">Bank soal kosong.</p>`;
       return;
     }
 
@@ -835,7 +877,7 @@
     const answer = parseInt(document.getElementById("soalAnswer").value);
 
     if (!category || !question || options.some(o => !o)) {
-      return alert("Harap lengkapi kategori, pertanyaan, dan keempat pilihan jawaban!");
+      return alert("Harap lengkapi kategori, pertanyaan, dan pilihan jawaban!");
     }
 
     const payload = { category, question, options, answer };
@@ -886,7 +928,7 @@
   }
 
   function deleteAllQuestions() {
-    if (!confirm("PERINGATAN: Semua soal dalam bank soal akan dihapus permanen. Lanjutkan?")) return;
+    if (!confirm("Hapus semua soal?")) return;
     questions = [];
     saveAllState();
     populateCategoryDropdowns();
@@ -894,7 +936,7 @@
   }
 
   function restoreDefaultQuestions() {
-    if (!confirm("Pulihkan 50 soal PPKn Hari Pahlawan?")) return;
+    if (!confirm("Pulihkan 50 soal PPKn?")) return;
     questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
     saveAllState();
     populateCategoryDropdowns();
@@ -916,7 +958,7 @@
     reader.onload = function(e) {
       try {
         const imported = JSON.parse(e.target.result);
-        if (!Array.isArray(imported)) throw new Error("Format tidak valid");
+        if (!Array.isArray(imported)) throw new Error();
         questions = imported;
         saveAllState();
         populateCategoryDropdowns();
@@ -972,7 +1014,7 @@
     if (newPin) settings.adminPin = newPin;
     saveAllState();
     applyBranding();
-    alert("Pengaturan identitas sekolah dan PIN berhasil disimpan!");
+    alert("Pengaturan identitas sekolah & PIN berhasil disimpan!");
   }
 
   applyBranding();
