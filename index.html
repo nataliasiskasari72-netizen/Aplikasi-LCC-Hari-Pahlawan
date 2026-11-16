@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LCC Hari Pahlawan - SMP Negeri 2 Purwosari</title>
-  <!-- Pustaka SheetJS untuk Ekspor Excel (.xlsx) -->
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --primary: #1e3a8a;
@@ -20,7 +18,7 @@
       --border: #e2e8f0;
     }
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
     header {
       background: linear-gradient(135deg, var(--primary), #0f172a);
       color: white;
@@ -49,7 +47,7 @@
     }
     header h1 { margin: 0; font-size: 1.4rem; letter-spacing: 0.5px; text-transform: uppercase; }
     header p { margin: 2px 0 0; font-size: 0.95rem; color: #fde68a; font-weight: 600; }
-    .container { max-width: 900px; width: 100%; margin: 20px auto; padding: 0 16px 40px; flex: 1; }
+    .container { max-width: 900px; margin: 20px auto; padding: 0 16px 40px; }
     .nav-bar { display: flex; justify-content: flex-end; margin-bottom: 14px; gap: 8px; }
     .card {
       background: var(--card);
@@ -167,25 +165,26 @@
       margin-bottom: 10px;
       background: #fafafa;
     }
-    .q-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
 
-    /* Footer */
-    footer {
-      background: #0f172a;
-      color: #94a3b8;
-      text-align: center;
-      padding: 14px 16px;
-      font-size: 0.88rem;
-      letter-spacing: 0.5px;
-      border-top: 1px solid #1e293b;
-    }
+footer {
+  background: #0f172a;
+  color: #94a3b8;
+  text-align: center;
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  letter-spacing: 0.5px;
+  border-top: 1px solid #1e293b;
+  margin-top: auto;
+}
+    
+    .q-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
   </style>
 </head>
 <body>
 
 <header>
   <div class="header-inner">
-    <img id="schoolLogoDisplay" class="school-logo" alt="Logo SMPN 2 Purwosari" />
+    <img id="schoolLogoDisplay" class="school-logo" alt="Logo SMPN 1 Semanu" />
     <div>
       <h1 id="schoolNameDisplay">SMP NEGERI 2 PURWOSARI</h1>
       <p id="quizTitleDisplay">Lomba Cerdas Cermat dalam Rangka Memperingati Hari Pahlawan</p>
@@ -209,16 +208,13 @@
       <select id="inputKelas">
         <option value="">-- Pilih Kelas --</option>
         <optgroup label="Kelas VII">
-          <option value="VII A">VII A</option>
-          <option value="VII B">VII B</option>
+          <option value="VII A">VII A</option><option value="VII B">VII B</option>
         </optgroup>
         <optgroup label="Kelas VIII">
-          <option value="VIII A">VIII A</option>
-          <option value="VIII B">VIII B</option>
+          <option value="VIII A">VIII A</option><option value="VIII B">VIII B</option>
         </optgroup>
         <optgroup label="Kelas IX">
-          <option value="IX A">IX A</option>
-          <option value="IX B">IX B</option>
+          <option value="IX A">IX A</option><option value="IX B">IX B</option>
         </optgroup>
       </select>
     </div>
@@ -272,7 +268,7 @@
       <div id="resScore" style="font-size:3rem; font-weight:800; color:var(--primary-light); line-height:1.1; margin:6px 0;">0</div>
       <div id="resDetail" style="font-size:0.92rem; color:var(--text);">Benar: 0 | Salah: 0</div>
     </div>
-    <p style="font-size:0.9rem; color:var(--muted);">Nilai Anda telah terkirim otomatis ke server panitia/guru.</p>
+    <p style="font-size:0.9rem; color:var(--muted);">Nilai Anda telah tersimpan otomatis ke papan peringkat panitia/guru.</p>
     <button class="btn btn-primary" onclick="resetToHome()">Kembali ke Halaman Awal</button>
   </div>
 
@@ -297,9 +293,8 @@
           <select id="filterRekapTahap" onchange="renderLeaderboard()"></select>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn btn-primary btn-sm" onclick="fetchOnlineLeaderboard()">🔄 Tarik Data Online</button>
-          <button class="btn btn-success btn-sm" onclick="exportExcel()">📥 Ekspor Excel (.xlsx)</button>
-          <button class="btn btn-danger btn-sm" onclick="clearLeaderboard()">🗑️ Reset Rekap</button>
+          <button class="btn btn-success btn-sm" onclick="exportCSV()">📥 Ekspor CSV / Excel</button>
+          <button class="btn btn-danger btn-sm" onclick="clearLeaderboard()">🗑️ Reset Rekap Nilai</button>
         </div>
       </div>
 
@@ -407,27 +402,23 @@
   </div>
 </div>
 
-<footer>
-  APLIKASI LCC SMP NEGERI 2 PURWOSARI POWERED BY@KUSWORO 2026
-</footer>
-
 <script>
-  // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP (/exec) ANDA DARI GOOGLE APPS SCRIPT
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyf1hMrVG5weKULtgGXTWo1S4qzEgb-asWjnaodRxqlxFon8uOZ6V3WO5WLaqfGQ0A/exec";
-
+  // Default SVG Shield Logo SMPN 1 Semanu
   const DEFAULT_LOGO = "data:image/svg+xml;utf8," + encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
       <path d="M60 6 L108 24 V62 C108 90 86 108 60 116 C34 108 12 90 12 62 V24 Z" fill="#1e3a8a" stroke="#d97706" stroke-width="6"/>
       <circle cx="60" cy="54" r="24" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
       <polygon points="60,34 65,48 80,48 68,57 72,71 60,62 48,71 52,57 40,48 55,48" fill="#d97706"/>
-      <text x="60" y="96" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">SMPN 2 PURWOSARI</text>
+      <text x="60" y="96" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">SMPN 1 SEMANU</text>
     </svg>
   `);
 
-  const STAGE_1 = "Tahap 1 (Penyisihan)";
-  const STAGE_2 = "Tahap 2 (Babak Final)";
+  const STAGE_1 = "Tahap 1 (Penyisihan 6 Kelas)";
+  const STAGE_2 = "Tahap 2 (Babak Final 3 Besar)";
 
+  // 50 Soal Resmi Tahap 1 & Tahap 2 beserta Kunci Jawaban Paket A & Paket B
   const DEFAULT_QUESTIONS = [
+    // --- TAHAP 1 (25 SOAL - KUNCI PAKET A) ---
     { category: STAGE_1, question: "Hari Pahlawan diperingati setiap tanggal ....", options: ["17 Agustus", "10 November", "20 Mei", "28 Oktober"], answer: 1 },
     { category: STAGE_1, question: "Peristiwa yang melatarbelakangi ditetapkannya tanggal 10 November sebagai Hari Pahlawan adalah ....", options: ["Proklamasi Kemerdekaan Indonesia", "Peristiwa Rengasdengklok", "Pertempuran Surabaya", "Kongres Pemuda II"], answer: 2 },
     { category: STAGE_1, question: "Tokoh yang dikenal sebagai pemimpin perjuangan rakyat Surabaya melalui siaran radio yang membakar semangat perlawanan adalah ....", options: ["Bung Tomo", "Ki Hajar Dewantara", "Mohammad Hatta", "Jenderal Sudirman"], answer: 0 },
@@ -454,6 +445,7 @@
     { category: STAGE_1, question: "Dalam sebuah kegiatan sosial, beberapa siswa enggan membantu membersihkan lingkungan karena merasa bukan tugas mereka. Sikap yang paling mencerminkan semangat kepahlawanan adalah ....", options: ["Membiarkan pekerjaan dilakukan oleh petugas kebersihan", "Mengajak teman bekerja sama demi kepentingan bersama", "Menunggu perintah guru terlebih dahulu", "Meninggalkan kegiatan tersebut"], answer: 1 },
     { category: STAGE_1, question: "Perhatikan pernyataan berikut:\n1) Menghargai jasa para pahlawan.\n2) Mengutamakan kepentingan bangsa.\n3) Menyebarkan kebencian terhadap kelompok lain.\n4) Menjaga persatuan dan kesatuan.\n5) Menolak bekerja sama dengan orang yang berbeda suku.\nPerilaku yang mencerminkan semangat kepahlawanan ditunjukkan oleh nomor ....", options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 5", "3, 4, dan 5"], answer: 1 },
 
+    // --- TAHAP 2 (25 SOAL - KUNCI PAKET B) ---
     { category: STAGE_2, question: "Tokoh yang mendapat julukan Ayam Jantan dari Timur adalah ....", options: ["Sultan Agung", "Sultan Hasanuddin", "Pangeran Antasari", "Tuanku Imam Bonjol"], answer: 1 },
     { category: STAGE_2, question: "Cut Nyak Dien merupakan pahlawan nasional yang berasal dari ....", options: ["Sumatra Barat", "Jawa Tengah", "Aceh", "Maluku"], answer: 2 },
     { category: STAGE_2, question: "Tokoh yang dikenal sebagai pemimpin perlawanan rakyat Sumatra Barat dalam Perang Padri adalah ....", options: ["Tuanku Imam Bonjol", "Sultan Hasanuddin", "Pattimura", "Pangeran Diponegoro"], answer: 0 },
@@ -481,13 +473,14 @@
     { category: STAGE_2, question: "Sekelompok siswa akan membuat kegiatan peringatan Hari Pahlawan. Mereka memiliki dua pilihan kegiatan:\nKegiatan I: Mengadakan lomba menyanyikan lagu perjuangan saja.\nKegiatan II: Mengadakan lomba lagu perjuangan sekaligus aksi sosial membantu masyarakat sekitar.\nJika tujuan kegiatan adalah meneladani nilai perjuangan pahlawan secara nyata, pilihan yang paling tepat adalah ....", options: ["Kegiatan I, karena hanya membutuhkan waktu singkat", "Kegiatan II, karena menggabungkan penghargaan sejarah dengan tindakan nyata kepedulian sosial", "Kedua kegiatan tidak perlu dilaksanakan", "Kegiatan I, karena kegiatan sosial bukan bagian dari semangat kepahlawanan"], answer: 1 }
   ];
 
-  let questions = JSON.parse(localStorage.getItem("lcc_purwosari_questions_v2")) || JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
-  let stagePasswords = JSON.parse(localStorage.getItem("lcc_purwosari_stage_pass_v2")) || {
+  // State Management
+  let questions = JSON.parse(localStorage.getItem("lcc_semanu_questions_v2")) || JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+  let stagePasswords = JSON.parse(localStorage.getItem("lcc_semanu_stage_pass_v2")) || {
     [STAGE_1]: "PAHLAWAN1",
     [STAGE_2]: "MERDEKA2"
   };
-  let leaderboard = JSON.parse(localStorage.getItem("lcc_purwosari_scores_v2")) || [];
-  let settings = JSON.parse(localStorage.getItem("lcc_purwosari_settings_v2")) || {
+  let leaderboard = JSON.parse(localStorage.getItem("lcc_semanu_scores_v2")) || [];
+  let settings = JSON.parse(localStorage.getItem("lcc_semanu_settings_v2")) || {
     schoolName: "SMP NEGERI 2 PURWOSARI",
     quizTitle: "Lomba Cerdas Cermat dalam Rangka Memperingati Hari Pahlawan",
     logo: DEFAULT_LOGO,
@@ -504,10 +497,10 @@
   };
 
   function saveAllState() {
-    localStorage.setItem("lcc_purwosari_questions_v2", JSON.stringify(questions));
-    localStorage.setItem("lcc_purwosari_stage_pass_v2", JSON.stringify(stagePasswords));
-    localStorage.setItem("lcc_purwosari_scores_v2", JSON.stringify(leaderboard));
-    localStorage.setItem("lcc_purwosari_settings_v2", JSON.stringify(settings));
+    localStorage.setItem("lcc_semanu_questions_v2", JSON.stringify(questions));
+    localStorage.setItem("lcc_semanu_stage_pass_v2", JSON.stringify(stagePasswords));
+    localStorage.setItem("lcc_semanu_scores_v2", JSON.stringify(leaderboard));
+    localStorage.setItem("lcc_semanu_settings_v2", JSON.stringify(settings));
   }
 
   function applyBranding() {
@@ -545,6 +538,7 @@
     }
   }
 
+  // Student Quiz Flow
   function startQuiz() {
     const kelas = document.getElementById("inputKelas").value;
     const namaRegu = document.getElementById("inputNamaRegu").value.trim() || `Regu ${kelas}`;
@@ -633,26 +627,16 @@
     const total = activeQuiz.items.length;
     const score = Math.round((correct / total) * 100);
 
-    const resultData = {
+    leaderboard.push({
+      id: Date.now(),
       kelas: activeQuiz.kelas,
       namaRegu: activeQuiz.namaRegu,
       tahap: activeQuiz.tahap,
       benar: correct,
       total: total,
-      skor: score
-    };
-
-    // Kirim data otomatis ke Google Sheets
-    if (WEB_APP_URL && WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbyFMlAokIL_Ek9JLMMM1qFwtak7BNmfucx5RDnCNOZlpmcblRUpuY4j4vNSvb2XvfU/exec") {
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(resultData)
-      }).catch(err => console.log("Gagal kirim ke sheets", err));
-    }
-
-    leaderboard.push({ id: Date.now(), ...resultData, waktu: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }) });
+      skor: score,
+      waktu: new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
+    });
     saveAllState();
 
     document.getElementById("viewQuiz").classList.add("hidden");
@@ -662,12 +646,54 @@
     document.getElementById("resDetail").textContent = `Benar: ${correct} dari ${total} soal | Salah: ${total - correct}`;
   }
 
+  function finishQuiz() {
+    const unanswered = activeQuiz.answers.filter(a => a === null).length;
+    if (unanswered > 0 && !confirm(`Masih ada ${unanswered} soal belum dijawab. Yakin ingin mengirim jawaban?`)) return;
+
+    let correct = 0;
+    activeQuiz.items.forEach((q, idx) => {
+      if (activeQuiz.answers[idx] === q.answer) correct++;
+    });
+
+    const total = activeQuiz.items.length;
+    const score = Math.round((correct / total) * 100);
+
+    const resultData = {
+      kelas: activeQuiz.kelas,
+      namaRegu: activeQuiz.namaRegu,
+      tahap: activeQuiz.tahap,
+      benar: correct,
+      total: total,
+      skor: score
+    };
+
+    // KIRIM OTOMATIS KE GOOGLE SHEETS
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyf1hMrVG5weKULtgGXTWo1S4qzEgb-asWjnaodRxqlxFon8uOZ6V3WO5WLaqfGQ0A/exec"; // Tempel URL /exec di sini
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(resultData)
+    }).catch(err => console.log("Gagal kirim ke sheets", err));
+
+    // Simpan lokal juga sebagai cadangan
+    leaderboard.push({ id: Date.now(), ...resultData, waktu: new Date().toLocaleTimeString("id-ID") });
+    saveAllState();
+
+    document.getElementById("viewQuiz").classList.add("hidden");
+    document.getElementById("viewResult").classList.remove("hidden");
+    document.getElementById("resReguInfo").textContent = `Kelas ${activeQuiz.kelas} (${activeQuiz.namaRegu}) — ${activeQuiz.tahap}`;
+    document.getElementById("resScore").textContent = score;
+    document.getElementById("resDetail").textContent = `Benar: ${correct} dari ${total} soal | Salah: ${total - correct}`;
+  }
+  
   function resetToHome() {
     document.getElementById("viewResult").classList.add("hidden");
     document.getElementById("viewStudentStart").classList.remove("hidden");
     document.getElementById("inputStagePass").value = "";
   }
 
+  // Admin Navigation & Logic
   function openAdminLogin() {
     const pin = prompt("Masukkan PIN Mode Guru / Panitia:");
     if (pin === null) return;
@@ -714,34 +740,7 @@
     }
   }
 
-  function fetchOnlineLeaderboard() {
-    if (!WEB_APP_URL || WEB_APP_URL === "https://script.google.com/macros/s/AKfycbyFMlAokIL_Ek9JLMMM1qFwtak7BNmfucx5RDnCNOZlpmcblRUpuY4j4vNSvb2XvfU/exec") {
-      return alert("URL Web App Google Sheets belum diatur di dalam kode!");
-    }
-    alert("Mengambil data rekap terbaru dari Google Sheets...");
-    fetch(WEB_APP_URL)
-      .then(res => res.json())
-      .then(data => {
-        leaderboard = data.map((item, index) => ({
-          id: index + 1,
-          kelas: item.kelas,
-          namaRegu: item.namaRegu,
-          tahap: item.tahap,
-          benar: item.benar,
-          total: item.total,
-          skor: item.skor,
-          waktu: new Date(item.waktu).toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
-        }));
-        saveAllState();
-        renderLeaderboard();
-        alert("Berhasil memuat data nilai online!");
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Gagal mengambil data online. Pastikan deploy Apps Script sudah benar.");
-      });
-  }
-
+  // Leaderboard & Ranking Logic (Top 9 Stage 1, Top 3 Stage 2)
   function renderLeaderboard() {
     const filter = document.getElementById("filterRekapTahap").value;
     let filtered = filter === "ALL" ? [...leaderboard] : leaderboard.filter(item => item.tahap === filter);
@@ -749,7 +748,7 @@
 
     const tbody = document.getElementById("leaderboardBody");
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:20px;">Belum ada data nilai. Klik tombol "Tarik Data Online" untuk memuat dari Google Sheets.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:20px;">Belum ada data nilai masuk.</td></tr>`;
       return;
     }
 
@@ -757,8 +756,8 @@
       const rank = idx + 1;
       let statusBadge = `<span class="badge badge-blue">Peserta</span>`;
       if (row.tahap.includes("Tahap 1")) {
-        statusBadge = rank <= 3
-          ? `<span class="badge badge-green">✔ LOLOS TAHAP 2</span>`
+        statusBadge = rank <= 9
+          ? `<span class="badge badge-green">✔ LOLOS TAHAP 2 (9 BESAR)</span>`
           : `<span class="badge badge-red">Gugur Penyisihan</span>`;
       } else if (row.tahap.includes("Tahap 2")) {
         if (rank === 1) statusBadge = `<span class="badge badge-gold">🥇 JUARA 1</span>`;
@@ -788,50 +787,27 @@
   }
 
   function clearLeaderboard() {
-    if (!confirm("Yakin ingin mereset seluruh rekap lokal?")) return;
+    if (!confirm("Yakin ingin mereset/menghapus seluruh rekap nilai?")) return;
     leaderboard = [];
     saveAllState();
     renderLeaderboard();
   }
 
-  function exportExcel() {
+  function exportCSV() {
     if (leaderboard.length === 0) return alert("Belum ada data untuk diekspor.");
     const sorted = [...leaderboard].sort((a, b) => b.skor - a.skor || b.benar - a.benar);
-    
-    const excelData = sorted.map((r, i) => {
-      let status = "Peserta";
-      if (r.tahap.includes("Tahap 1")) {
-        status = (i + 1) <= 3 ? "LOLOS TAHAP 2" : "Gugur Penyisihan";
-      } else if (r.tahap.includes("Tahap 2")) {
-        if (i === 0) status = "JUARA 1";
-        else if (i === 1) status = "JUARA 2";
-        else if (i === 2) status = "JUARA 3";
-        else status = "Finalis";
-      }
-
-      return {
-        "Peringkat": i + 1,
-        "Kelas": r.kelas,
-        "Nama Regu": r.namaRegu,
-        "Tahap": r.tahap,
-        "Jawaban Benar": r.benar,
-        "Total Soal": r.total,
-        "Skor Akhir": r.skor,
-        "Status": status
-      };
+    let csv = "Peringkat,Kelas,Nama Regu,Tahap,Benar,Total Soal,Skor\n";
+    sorted.forEach((r, i) => {
+      csv += `${i + 1},"${r.kelas}","${r.namaRegu}","${r.tahap}",${r.benar},${r.total},${r.skor}\n`;
     });
-
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    worksheet["!cols"] = [
-      { wch: 10 }, { wch: 10 }, { wch: 25 }, { wch: 32 },
-      { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 24 }
-    ];
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Nilai LCC");
-    XLSX.writeFile(workbook, "Rekap_LCC_Hari_Pahlawan_SMPN2Purwosari.xlsx");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Rekap_LCC_Hari_Pahlawan_SMPN1Semanu.csv";
+    a.click();
   }
 
+  // Question Bank CRUD
   function renderQuestionList() {
     const filter = document.getElementById("filterBankSoal").value;
     const container = document.getElementById("questionListContainer");
@@ -841,7 +817,7 @@
       .filter(q => filter === "ALL" || q.category === filter);
 
     if (listWithIndex.length === 0) {
-      container.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">Bank soal kosong.</p>`;
+      container.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">Bank soal kosong. Silakan tambah soal baru atau pulihkan soal bawaan.</p>`;
       return;
     }
 
@@ -877,7 +853,7 @@
     const answer = parseInt(document.getElementById("soalAnswer").value);
 
     if (!category || !question || options.some(o => !o)) {
-      return alert("Harap lengkapi kategori, pertanyaan, dan pilihan jawaban!");
+      return alert("Harap lengkapi kategori, pertanyaan, dan keempat pilihan jawaban!");
     }
 
     const payload = { category, question, options, answer };
@@ -928,7 +904,7 @@
   }
 
   function deleteAllQuestions() {
-    if (!confirm("Hapus semua soal?")) return;
+    if (!confirm("PERINGATAN: Semua soal dalam bank soal akan dihapus permanen. Lanjutkan?")) return;
     questions = [];
     saveAllState();
     populateCategoryDropdowns();
@@ -936,7 +912,7 @@
   }
 
   function restoreDefaultQuestions() {
-    if (!confirm("Pulihkan 50 soal PPKn?")) return;
+    if (!confirm("Pulihkan 50 soal PPKn Hari Pahlawan (25 Tahap 1 + 25 Tahap 2)?")) return;
     questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
     saveAllState();
     populateCategoryDropdowns();
@@ -947,7 +923,7 @@
     const blob = new Blob([JSON.stringify(questions, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "Bank_Soal_LCC_SMPN2Purwosari.json";
+    a.download = "Bank_Soal_LCC_SMPN1Semanu.json";
     a.click();
   }
 
@@ -958,7 +934,7 @@
     reader.onload = function(e) {
       try {
         const imported = JSON.parse(e.target.result);
-        if (!Array.isArray(imported)) throw new Error();
+        if (!Array.isArray(imported)) throw new Error("Format tidak valid");
         questions = imported;
         saveAllState();
         populateCategoryDropdowns();
@@ -971,6 +947,7 @@
     reader.readAsText(file);
   }
 
+  // Settings & Passwords
   function loadSettingsForm() {
     const cats = getCategories();
     const container = document.getElementById("stagePasswordSettings");
@@ -1014,11 +991,21 @@
     if (newPin) settings.adminPin = newPin;
     saveAllState();
     applyBranding();
-    alert("Pengaturan identitas sekolah & PIN berhasil disimpan!");
+    alert("Pengaturan identitas sekolah dan PIN berhasil disimpan!");
   }
 
+  // Initialize App
   applyBranding();
   populateCategoryDropdowns();
 </script>
+  <!-- Bagian Konten Utama Berakhir di Sini -->
+</div> <!-- Penutup container -->
+
+<footer>
+  Aplikasi LCC Hari Pahlawan Powered by@Kusworo 2026
+</footer>
+
+</body>
+</html>
 </body>
 </html>
